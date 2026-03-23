@@ -46,25 +46,30 @@ input showMitigation(false) // Show marker when FVG is mitigated
 // =============================================================================
 var cumRng(0)
 var barCnt(0)
+var thresh(0)
 
 barCnt = barCnt + 1
 cumRng = cumRng + (high - low) / low
 
-let thresh = autoThresh ? (cumRng / barCnt) : (threshPct / 100)
+if autoThresh then
+    thresh = cumRng / barCnt
+else
+    thresh = threshPct / 100
+end
 
 
 // =============================================================================
 // FVG DETECTION
 // =============================================================================
 // Bullish: gap between current candle's low and 2-bars-ago high
-let bullGap     = low - high[2]
-let isBullRaw   = low > high[2] and close[1] > high[2]
-let isBull      = isBullRaw and (bullGap / high[2]) > thresh
+let bullGap   = low - high[2]
+let isBullRaw = low > high[2] and close[1] > high[2]
+let isBull    = isBullRaw and (bullGap / high[2]) > thresh
 
 // Bearish: gap between 2-bars-ago low and current candle's high
-let bearGap     = low[2] - high
-let isBearRaw   = high < low[2] and close[1] < low[2]
-let isBear      = isBearRaw and (bearGap / high) > thresh
+let bearGap   = low[2] - high
+let isBearRaw = high < low[2] and close[1] < low[2]
+let isBear    = isBearRaw and (bearGap / high) > thresh
 
 
 // =============================================================================
@@ -96,9 +101,15 @@ if isBull then
 end
 
 // Dynamic mode: compress top boundary toward bottom as price fills the gap
-// Pine Script equivalent: max_bull_fvg = math.max(math.min(close, max), min)
+// Pine Script: max_bull_fvg = math.max(math.min(close, max), min)
 if dynamicMode and bullOn and not isBull then
-    bullMax = close < bullMax ? (close > bullMin ? close : bullMin) : bullMax
+    if close < bullMax then
+        if close > bullMin then
+            bullMax = close
+        else
+            bullMax = bullMin
+        end
+    end
 end
 
 // Mitigation: price closes below the FVG bottom -> gap invalidated
@@ -120,9 +131,15 @@ if isBear then
 end
 
 // Dynamic mode: compress bottom boundary upward as price fills the gap
-// Pine Script equivalent: min_bear_fvg = math.min(math.max(close, min), max)
+// Pine Script: min_bear_fvg = math.min(math.max(close, min), max)
 if dynamicMode and bearOn and not isBear then
-    bearMin = close > bearMin ? (close < bearMax ? close : bearMax) : bearMin
+    if close > bearMin then
+        if close < bearMax then
+            bearMin = close
+        else
+            bearMin = bearMax
+        end
+    end
 end
 
 // Mitigation: price closes above the FVG top -> gap invalidated
@@ -135,23 +152,79 @@ end
 // =============================================================================
 // TRANSITION FLAGS  (for markers)
 // =============================================================================
-// Using var to reliably track previous bar state (let[N] not guaranteed)
 var prevBull(false)
 var prevBear(false)
 var prevBullOn(false)
 var prevBearOn(false)
 
-// Snapshot current state for next bar comparison
-let newBullSignal    = isBull and not prevBull
-let newBearSignal    = isBear and not prevBear
+let newBullSignal     = isBull and not prevBull
+let newBearSignal     = isBear and not prevBear
 let bullJustMitigated = not bullOn and prevBullOn
 let bearJustMitigated = not bearOn and prevBearOn
 
-// Update previous-bar snapshots (takes effect on NEXT bar via [1] behavior)
-prevBull    = isBull
-prevBear    = isBear
-prevBullOn  = bullOn
-prevBearOn  = bearOn
+prevBull   = isBull
+prevBear   = isBear
+prevBullOn = bullOn
+prevBearOn = bearOn
+
+
+// =============================================================================
+// PLOT VALUES  (pre-compute to avoid ternary inside plot() calls)
+// =============================================================================
+var p1(0)
+var p2(0)
+var p3(0)
+var p4(0)
+var p5(0)
+var p6(0)
+var p7(0)
+var p8(0)
+
+// Bull FVG band
+if bullOn then
+    p1 = bullMax
+    p2 = bullMin
+else
+    p1 = 0
+    p2 = 0
+end
+
+// Bear FVG band
+if bearOn then
+    p3 = bearMax
+    p4 = bearMin
+else
+    p3 = 0
+    p4 = 0
+end
+
+// Bull FVG detected marker (at middle-candle low)
+if newBullSignal then
+    p5 = low[1]
+else
+    p5 = 0
+end
+
+// Bear FVG detected marker (at middle-candle high)
+if newBearSignal then
+    p6 = high[1]
+else
+    p6 = 0
+end
+
+// Bull mitigation marker
+if showMitigation and bullJustMitigated then
+    p7 = high
+else
+    p7 = 0
+end
+
+// Bear mitigation marker
+if showMitigation and bearJustMitigated then
+    p8 = low
+else
+    p8 = 0
+end
 
 
 // =============================================================================
@@ -159,36 +232,34 @@ prevBearOn  = bearOn
 // =============================================================================
 
 // -- Bullish FVG Band --
-// hbands on plots 1+2 fills the area between the two boundary lines (green)
 [PlotStyle(1, hbands, 2)]
-plot1(bullOn ? bullMax : 0, "Bull FVG Top", RGB(8, 153, 129))
+plot1(p1, "Bull FVG Top", RGB(8, 153, 129))
 
 [PlotStyle(2, hbands, 2)]
-plot2(bullOn ? bullMin : 0, "Bull FVG Bottom", RGB(8, 153, 129))
+plot2(p2, "Bull FVG Bottom", RGB(8, 153, 129))
 
 // -- Bearish FVG Band --
-// hbands on plots 3+4 fills the area between the two boundary lines (red)
 [PlotStyle(3, hbands, 2)]
-plot3(bearOn ? bearMax : 0, "Bear FVG Top", RGB(242, 54, 69))
+plot3(p3, "Bear FVG Top", RGB(242, 54, 69))
 
 [PlotStyle(4, hbands, 2)]
-plot4(bearOn ? bearMin : 0, "Bear FVG Bottom", RGB(242, 54, 69))
+plot4(p4, "Bear FVG Bottom", RGB(242, 54, 69))
 
-// -- Bullish FVG Detected Marker (triangle up at middle-candle low) --
+// -- Bullish FVG Detected Marker --
 [PlotStyle(5, triangleUp, 4)]
-plot5(newBullSignal ? low[1] : 0, "Bull FVG", RGB(8, 153, 129))
+plot5(p5, "Bull FVG", RGB(8, 153, 129))
 
-// -- Bearish FVG Detected Marker (triangle down at middle-candle high) --
+// -- Bearish FVG Detected Marker --
 [PlotStyle(6, triangleDown, 4)]
-plot6(newBearSignal ? high[1] : 0, "Bear FVG", RGB(242, 54, 69))
+plot6(p6, "Bear FVG", RGB(242, 54, 69))
 
 // -- Bull Mitigation Marker --
 [PlotStyle(7, triangleDown, 3)]
-plot7(showMitigation and bullJustMitigated ? high : 0, "Bull Mitigated", RGB(8, 153, 129))
+plot7(p7, "Bull Mitigated", RGB(8, 153, 129))
 
 // -- Bear Mitigation Marker --
 [PlotStyle(8, triangleUp, 3)]
-plot8(showMitigation and bearJustMitigated ? low : 0, "Bear Mitigated", RGB(242, 54, 69))
+plot8(p8, "Bear Mitigated", RGB(242, 54, 69))
 
 // -- Count Histograms in Subchart --
 [PlotStyle(9, histogram, 2)]

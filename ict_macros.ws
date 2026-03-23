@@ -75,9 +75,17 @@ input macro1515(true)   // NY 03:15 PM - 03:45 PM ET
 //   London std, NY std: UTC 02:33 -> ET = 02:33-5 = prev 21:33
 //   London std, NY DST: UTC 02:33 -> ET = 02:33-4 = prev 22:33
 //   London DST, NY std: UTC 01:33 -> ET = 01:33-5 = prev 20:33
-let ln1_startH = (londonDST and nyDST) ? 21 : (londonDST and not nyDST ? 20 : (not londonDST and nyDST ? 22 : 21))
+var ln1_startH(21)
+if londonDST and nyDST then
+    ln1_startH = 21
+elseif londonDST and not nyDST then
+    ln1_startH = 20
+elseif not londonDST and nyDST then
+    ln1_startH = 22
+else
+    ln1_startH = 21
+end
 let ln1_startM = 33
-let ln1_endH   = ln1_startH + 0   // end is 27 min later - handle via minute check
 let ln1_endM   = 0   // :00 of ln1_startH+1 hour
 
 // ET hour for London 04:03 macro start:
@@ -85,9 +93,17 @@ let ln1_endM   = 0   // :00 of ln1_startH+1 hour
 //   London std, NY std: UTC 04:03 -> ET = 04:03-5 = prev 23:03
 //   London std, NY DST: UTC 04:03 -> ET = 04:03-4 = 00:03
 //   London DST, NY std: UTC 03:03 -> ET = 03:03-5 = prev 22:03
-let ln2_startH = (londonDST and nyDST) ? 23 : (londonDST and not nyDST ? 22 : (not londonDST and nyDST ? 0 : 23))
+var ln2_startH(23)
+if londonDST and nyDST then
+    ln2_startH = 23
+elseif londonDST and not nyDST then
+    ln2_startH = 22
+elseif not londonDST and nyDST then
+    ln2_startH = 0
+else
+    ln2_startH = 23
+end
 let ln2_startM = 3
-let ln2_endH   = ln2_startH       // 04:30 = ln2_startH:30
 let ln2_endM   = 30
 
 
@@ -119,8 +135,12 @@ if macro0233 then
         mA1 = true
     end
     if mA1 then
-        mH1 = high > mH1 ? high : mH1
-        mL1 = low  < mL1 ? low  : mL1
+        if high > mH1 then
+            mH1 = high
+        end
+        if low < mL1 then
+            mL1 = low
+        end
         if hour == (ln1_startH + 1) then
             mA1 = false
         end
@@ -135,12 +155,16 @@ if macro0403 then
         mA2 = true
     end
     if mA2 then
-        mH2 = high > mH2 ? high : mH2
-        mL2 = low  < mL2 ? low  : mL2
-        if hour == ln2_endH and minute >= ln2_endM then
+        if high > mH2 then
+            mH2 = high
+        end
+        if low < mL2 then
+            mL2 = low
+        end
+        if hour == ln2_startH and minute >= ln2_endM then
             mA2 = false
         end
-        if hour > ln2_endH and ln2_endH != 23 then
+        if hour > ln2_startH and ln2_startH != 23 then
             mA2 = false
         end
     end
@@ -154,8 +178,12 @@ if macro0850 then
         mA3 = true
     end
     if mA3 then
-        mH3 = high > mH3 ? high : mH3
-        mL3 = low  < mL3 ? low  : mL3
+        if high > mH3 then
+            mH3 = high
+        end
+        if low < mL3 then
+            mL3 = low
+        end
         if hour == 9 and minute > 10 then
             mA3 = false
         end
@@ -173,8 +201,12 @@ if macro0950 then
         mA4 = true
     end
     if mA4 then
-        mH4 = high > mH4 ? high : mH4
-        mL4 = low  < mL4 ? low  : mL4
+        if high > mH4 then
+            mH4 = high
+        end
+        if low < mL4 then
+            mL4 = low
+        end
         if hour == 10 and minute > 10 then
             mA4 = false
         end
@@ -192,8 +224,12 @@ if macro1050 then
         mA5 = true
     end
     if mA5 then
-        mH5 = high > mH5 ? high : mH5
-        mL5 = low  < mL5 ? low  : mL5
+        if high > mH5 then
+            mH5 = high
+        end
+        if low < mL5 then
+            mL5 = low
+        end
         if hour == 11 and minute > 10 then
             mA5 = false
         end
@@ -211,8 +247,12 @@ if macro1150 then
         mA6 = true
     end
     if mA6 then
-        mH6 = high > mH6 ? high : mH6
-        mL6 = low  < mL6 ? low  : mL6
+        if high > mH6 then
+            mH6 = high
+        end
+        if low < mL6 then
+            mL6 = low
+        end
         if hour == 12 and minute > 10 then
             mA6 = false
         end
@@ -230,8 +270,12 @@ if macro1310 then
         mA7 = true
     end
     if mA7 then
-        mH7 = high > mH7 ? high : mH7
-        mL7 = low  < mL7 ? low  : mL7
+        if high > mH7 then
+            mH7 = high
+        end
+        if low < mL7 then
+            mL7 = low
+        end
         if hour == 13 and minute > 40 then
             mA7 = false
         end
@@ -249,8 +293,12 @@ if macro1515 then
         mA8 = true
     end
     if mA8 then
-        mH8 = high > mH8 ? high : mH8
-        mL8 = low  < mL8 ? low  : mL8
+        if high > mH8 then
+            mH8 = high
+        end
+        if low < mL8 then
+            mL8 = low
+        end
         if hour == 15 and minute > 45 then
             mA8 = false
         end
@@ -268,16 +316,80 @@ end
 let anyMacro = mA1 or mA2 or mA3 or mA4 or mA5 or mA6 or mA7 or mA8
 
 // Previous bar aggregate (for transition detection)
-let prevAny   = mA1[1] or mA2[1] or mA3[1] or mA4[1] or mA5[1] or mA6[1] or mA7[1] or mA8[1]
+let prevAny = mA1[1] or mA2[1] or mA3[1] or mA4[1] or mA5[1] or mA6[1] or mA7[1] or mA8[1]
 
 // Pick the active macro's high/low (first active macro wins)
-let activeHigh = mA1 ? mH1 : (mA2 ? mH2 : (mA3 ? mH3 : (mA4 ? mH4 : (mA5 ? mH5 : (mA6 ? mH6 : (mA7 ? mH7 : (mA8 ? mH8 : 0)))))))
-let activeLow  = mA1 ? mL1 : (mA2 ? mL2 : (mA3 ? mL3 : (mA4 ? mL4 : (mA5 ? mL5 : (mA6 ? mL6 : (mA7 ? mL7 : (mA8 ? mL8 : 0)))))))
-let activeMid  = (activeHigh + activeLow) / 2
+var activeHigh(0)
+var activeLow(0)
+if mA1 then
+    activeHigh = mH1
+    activeLow  = mL1
+elseif mA2 then
+    activeHigh = mH2
+    activeLow  = mL2
+elseif mA3 then
+    activeHigh = mH3
+    activeLow  = mL3
+elseif mA4 then
+    activeHigh = mH4
+    activeLow  = mL4
+elseif mA5 then
+    activeHigh = mH5
+    activeLow  = mL5
+elseif mA6 then
+    activeHigh = mH6
+    activeLow  = mL6
+elseif mA7 then
+    activeHigh = mH7
+    activeLow  = mL7
+elseif mA8 then
+    activeHigh = mH8
+    activeLow  = mL8
+else
+    activeHigh = 0
+    activeLow  = 0
+end
+
+let activeMid = (activeHigh + activeLow) / 2
 
 // Transition flags
 let macroJustStarted = anyMacro and not prevAny
 let macroJustEnded   = not anyMacro and prevAny
+
+
+// =============================================================================
+// PLOT VALUES  (pre-compute to avoid ternary inside plot() calls)
+// =============================================================================
+var pTop(0)
+var pMid(0)
+var pBot(0)
+var pStart(0)
+var pEnd(0)
+var pInMacro(0)
+
+if anyMacro then
+    pTop     = activeHigh
+    pMid     = activeMid
+    pBot     = activeLow
+    pInMacro = 1
+else
+    pTop     = 0
+    pMid     = 0
+    pBot     = 0
+    pInMacro = 0
+end
+
+if macroJustStarted then
+    pStart = low
+else
+    pStart = 0
+end
+
+if macroJustEnded then
+    pEnd = high
+else
+    pEnd = 0
+end
 
 
 // =============================================================================
@@ -295,20 +407,20 @@ let macroJustEnded   = not anyMacro and prevAny
 // Use the subchart histogram (plot 6) as a cleaner "in macro" signal.
 
 [PlotStyle(1, line, 2)]
-plot1(anyMacro ? activeHigh : 0, "Macro Top", Blue)
+plot1(pTop, "Macro Top", Blue)
 
 [PlotStyle(2, dashes, 1)]
-plot2(anyMacro ? activeMid : 0, "Macro Mid", DarkGray)
+plot2(pMid, "Macro Mid", DarkGray)
 
 [PlotStyle(3, line, 2)]
-plot3(anyMacro ? activeLow : 0, "Macro Bottom", Blue)
+plot3(pBot, "Macro Bottom", Blue)
 
 [PlotStyle(4, triangleUp, 4)]
-plot4(macroJustStarted ? low : 0, "Macro Start", Green)
+plot4(pStart, "Macro Start", Green)
 
 [PlotStyle(5, triangleDown, 4)]
-plot5(macroJustEnded ? high : 0, "Macro End", Red)
+plot5(pEnd, "Macro End", Red)
 
 [PlotStyle(6, histogram, 2)]
 [PlotSubchart(6, 1)]
-plot6(anyMacro ? 1 : 0, "In Macro", RGB(100, 149, 237))
+plot6(pInMacro, "In Macro", RGB(100, 149, 237))
