@@ -31,20 +31,20 @@
 // =============================================================================
 
 // DST Controls
-input boolean londonDST(true)  // London BST active? (UTC+1 in summer, UTC+0 in winter)
-input boolean nyDST(true)      // New York EDT active? (UTC-4 summer, UTC-5 winter)
+input londonDST(true)  // London BST active? (UTC+1 in summer, UTC+0 in winter)
+input nyDST(true)      // New York EDT active? (UTC-4 summer, UTC-5 winter)
 
 // --- London Macros ---
-input boolean macro0233(false)  // London 02:33 AM - 03:00 AM (UTC)
-input boolean macro0403(false)  // London 04:03 AM - 04:30 AM (UTC)
+input macro0233(false)  // London 02:33 AM - 03:00 AM (UTC)
+input macro0403(false)  // London 04:03 AM - 04:30 AM (UTC)
 
 // --- New York Macros ---
-input boolean macro0850(false)  // NY 08:50 AM - 09:10 AM ET
-input boolean macro0950(true)   // NY 09:50 AM - 10:10 AM ET
-input boolean macro1050(true)   // NY 10:50 AM - 11:10 AM ET
-input boolean macro1150(false)  // NY 11:50 AM - 12:10 PM ET
-input boolean macro1310(true)   // NY 01:10 PM - 01:40 PM ET
-input boolean macro1515(true)   // NY 03:15 PM - 03:45 PM ET
+input macro0850(false)  // NY 08:50 AM - 09:10 AM ET
+input macro0950(true)   // NY 09:50 AM - 10:10 AM ET
+input macro1050(true)   // NY 10:50 AM - 11:10 AM ET
+input macro1150(false)  // NY 11:50 AM - 12:10 PM ET
+input macro1310(true)   // NY 01:10 PM - 01:40 PM ET
+input macro1515(true)   // NY 03:15 PM - 03:45 PM ET
 
 
 // =============================================================================

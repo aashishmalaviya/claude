@@ -35,10 +35,10 @@
 // =============================================================================
 // INPUTS
 // =============================================================================
-input number  threshPct(0)          // Threshold % - minimum gap size (0 = all)
-input boolean autoThresh(false)     // Auto threshold (avg body-range based)
-input boolean dynamicMode(false)    // Compress FVG boundary as price fills gap
-input boolean showMitigation(false) // Show marker when FVG is mitigated
+input threshPct(0)          // Threshold % - minimum gap size (0 = all)
+input autoThresh(false)     // Auto threshold (avg body-range based)
+input dynamicMode(false)    // Compress FVG boundary as price fills gap
+input showMitigation(false) // Show marker when FVG is mitigated
 
 
 // =============================================================================
