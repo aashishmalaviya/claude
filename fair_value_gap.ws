@@ -181,21 +181,26 @@ var p7(0)
 var p8(0)
 
 // Bull FVG band
+// IMPORTANT: use 'close' (not 0) when inactive.
+// hbands fills the area between the two series across ALL bars.
+// If we output 0, the fill spans from the FVG price level all the way
+// down to 0, creating a massive colored box. Using 'close' for both
+// plots when inactive means: fill height = 0 → completely invisible.
 if bullOn then
     p1 = bullMax
     p2 = bullMin
 else
-    p1 = 0
-    p2 = 0
+    p1 = close
+    p2 = close
 end
 
-// Bear FVG band
+// Bear FVG band  (same reasoning)
 if bearOn then
     p3 = bearMax
     p4 = bearMin
 else
-    p3 = 0
-    p4 = 0
+    p3 = close
+    p4 = close
 end
 
 // Bull FVG detected marker (at middle-candle low)
